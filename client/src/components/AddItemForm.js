@@ -1,0 +1,411 @@
+import React, { useState, useMemo } from 'react';
+import { X, Plus, MessageCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { apiPost } from '../utils/api';
+import toast from 'react-hot-toast';
+
+const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
+  const [formData, setFormData] = useState({
+    base: '',
+    name: '',
+    rarity: '',
+    level: '',
+    quality: '',
+    price: '',
+    priceUnit: 'k',
+    sellerDiscord: '',
+  });
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showBaseSuggestions, setShowBaseSuggestions] = useState(false);
+
+  const [items,setItems] = useState([  { "type": "Armor", "name": "Helm" },
+    { "type": "Armor", "name": "Gauntlets" },
+    { "type": "Armor", "name": "Greaves" },
+    { "type": "Armor", "name": "Platemail" },
+    { "type": "Armor", "name": "Platelegs" },
+    { "type": "Armor", "name": "Shield" },
+  
+    { "type": "Armor", "name": "Thread Helm" },
+    { "type": "Armor", "name": "Thread Gloves" },
+    { "type": "Armor", "name": "Thread Boots" },
+    { "type": "Armor", "name": "Thread Top" },
+    { "type": "Armor", "name": "Thread Bottom" },
+    { "type": "Armor", "name": "Gilded Spellbook" },
+  
+    { "type": "Weapon", "name": "Bardiche" },
+    { "type": "Weapon", "name": "Battleaxe" },
+    { "type": "Weapon", "name": "Mace" },
+    { "type": "Weapon", "name": "Warhammer" },
+    { "type": "Weapon", "name": "Widesword" },
+  
+    { "type": "Weapon", "name": "Curved Dagger" },
+    { "type": "Weapon", "name": "Dagger" },
+    { "type": "Weapon", "name": "Short Sword" },
+    { "type": "Weapon", "name": "Sword" },
+  
+    { "type": "Weapon", "name": "Broadsword" },
+    { "type": "Weapon", "name": "Claymore" },
+    { "type": "Weapon", "name": "Halberd" },
+    { "type": "Weapon", "name": "Longsword" },
+    { "type": "Weapon", "name": "Trident" },
+  
+    { "type": "Weapon", "name": "Arcane Staff" },
+    { "type": "Weapon", "name": "Fire Staff" },
+    { "type": "Weapon", "name": "Ice Staff" },
+    { "type": "Weapon", "name": "Thunder Staff" },
+  
+    { "type": "Weapon", "name": "Composite Bow" },
+    { "type": "Weapon", "name": "Longbow" },
+    { "type": "Weapon", "name": "Recurve Bow" },
+    { "type": "Weapon", "name": "Shortbow" }]);
+
+  const [baseItems] = useState([
+    // Base materials
+    "Bronze", "Steel", "Sunstone", "Bloodchrome", "Meteor", "Onyx", "Lypriptite", "Azurite", "Emerald", "Citrine", "Kunzite", "Aquamarine", "Jade", "Zircon", "Topaz", "Rhodonite",
+    // Remnant
+    "Spiderfang", "Ghostly", "Fireborn", "Bone", "Pharaoh's", "Frozen", "Frostbite", "Scorched", "Defiled", "Dark Sea", "Empty", "Valiant", "Flarium", "Ominous", "Dark", "Abyssal", "Void",
+    // Spoils
+    "Scavenge", "Perpetual", "Famine",
+    // Trials
+    "Wintertide", "Azure Break", "Fatebringer", "Everfrost", "Umbral"
+  ]);
+  const userId = (() => {
+    let id = localStorage.getItem('auction_user_id');
+    if (!id) {
+      id = 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem('auction_user_id', id);
+    }
+    return id;
+  })();
+
+  const filteredItems = useMemo(() => {
+    if (!formData.name || formData.name.length < 2) return [];
+    const query = formData.name.toLowerCase();
+    return items
+      .filter(item => item.name.toLowerCase().includes(query))
+      .slice(0, 5); // Limit to 5 suggestions
+  }, [formData.name, items]);
+
+  const filteredBaseItems = useMemo(() => {
+    if (!formData.base || formData.base.length < 2) return [];
+    const query = formData.base.toLowerCase();
+    return baseItems
+      .filter(item => item.toLowerCase().includes(query))
+      .slice(0, 8); // Limit to 8 suggestions
+  }, [formData.base, baseItems]);
+
+  const isValidDiscordContact = (val) => {
+    if (!val) return false;
+    const v = String(val).trim();
+    // Accept: numeric user ID, discord.com user URL, discord invite, full discord:// deep link
+    if (/^\d{17,20}$/.test(v)) return true;
+    if (/^https?:\/\/discord\.com\/users\/\d{17,20}$/i.test(v)) return true;
+    if (/^https?:\/\/discord\.gg\/[\w-]+$/i.test(v)) return true;
+    if (/^discord:\/\//i.test(v)) return true;
+    return false;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (formData.name && formData.price) {
+      try {
+        // Validate that the item name exists in the items list
+        const isValidItem = items.some(item => item.name === formData.name);
+        if (!isValidItem) {
+          toast.error('Please select a valid item from the suggestions or enter the exact item name.');
+          return;
+        }
+
+        // Find the item to get its category/type
+        const selectedItem = items.find(item => item.name === formData.name);
+        const itemCategory = selectedItem ? selectedItem.type : '';
+
+        if (!isValidDiscordContact(formData.sellerDiscord)) {
+          toast.error('Please enter a valid Discord contact: numeric user ID (recommended), a full profile URL (https://discord.com/users/{id}), an invite (https://discord.gg/{code}), or a discord:// deep link.');
+          return;
+        }
+        const newItem = await apiPost('/api/items', {
+          ...formData,
+          category: itemCategory,
+          userId,
+        });
+        onAddItem(newItem);
+        toast.success('Item added successfully!');
+        setFormData({
+          base: '',
+          name: '',
+          rarity: '',
+          level: '',
+          quality: '',
+          price: '',
+          sellerDiscord: '',
+        });
+        onClose();
+      } catch (err) {
+        toast.error(err.message || 'Failed to add item');
+      }
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+    if (name === 'name') {
+      setShowSuggestions(value.length >= 2);
+    }
+    if (name === 'base') {
+      setShowBaseSuggestions(value.length >= 2);
+    }
+  };
+
+  const handleSuggestionClick = (itemName) => {
+    setFormData({
+      ...formData,
+      name: itemName,
+    });
+    setShowSuggestions(false);
+  };
+
+  const handleBaseSuggestionClick = (baseName) => {
+    setFormData({
+      ...formData,
+      base: baseName,
+    });
+    setShowBaseSuggestions(false);
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+          />
+
+          {/* Modal */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ type: 'spring', duration: 0.3 }}
+            className="fixed inset-0 flex items-center justify-center z-50 p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-purple-600 to-indigo-700 px-6 py-4 flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <Plus className="w-6 h-6" />
+                  Add New Item
+                </h2>
+                <button
+                  onClick={onClose}
+                  className="text-white hover:text-gray-200 transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <div className="relative">
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Base *
+                  </label>
+                  <input
+                    type="text"
+                    name="base"
+                    value={formData.base}
+                    onChange={handleChange}
+                    onFocus={() => setShowBaseSuggestions(formData.base.length >= 2)}
+                    onBlur={() => setTimeout(() => setShowBaseSuggestions(false), 200)}
+                    required
+                    placeholder="e.g. Steel, Bronze, Void..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                  />
+                  {showBaseSuggestions && filteredBaseItems.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {filteredBaseItems.map((item, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleBaseSuggestionClick(item)}
+                          className="w-full px-4 py-2 text-left hover:bg-purple-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                        >
+                          <div className="font-medium text-gray-900">{item}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Item Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    onFocus={() => setShowSuggestions(formData.name.length >= 2)}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                  />
+                  {showSuggestions && filteredItems.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {filteredItems.map((item, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleSuggestionClick(item.name)}
+                          className="w-full px-4 py-2 text-left hover:bg-purple-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                        >
+                          <div className="font-medium text-gray-900">{item.name}</div>
+                          <div className="text-sm text-gray-500">{item.type}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Rarity *
+                  </label>
+                  <select
+                    name="rarity"
+                    value={formData.rarity}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                  >
+                    <option value="">Select Rarity</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Excellent">Excellent</option>
+                    <option value="Cosmetic">Cosmetic</option>
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Level
+                    </label>
+                    <input
+                      type="number"
+                      name="level"
+                      value={formData.level}
+                      onChange={handleChange}
+                      min="1"
+                      max="10"
+                      placeholder="1-10"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Quality (%)
+                    </label>
+                    <input
+                      type="number"
+                      name="quality"
+                      value={formData.quality}
+                      onChange={handleChange}
+                      min="1"
+                      max="100"
+                      placeholder="1-100%"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Starting Price *
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleChange}
+                      required
+                      min="0"
+                      step="0.01"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      Price Unit *
+                    </label>
+                    <select
+                      name="priceUnit"
+                      value={formData.priceUnit}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                    >
+                      <option value="k">Thousands (k)</option>
+                      <option value="m">Millions (m)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <MessageCircle className="inline w-4 h-4 mr-1" />
+                    Discord Contact
+                  </label>
+                  <input
+                    type="text"
+                    name="sellerDiscord"
+                    value={formData.sellerDiscord}
+                    onChange={handleChange}
+                    placeholder="e.g. 123456789012345678"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Notice: Items will be automatically deleted after 14 days if not sold.
+                  </p>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="flex-1 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-800 transition-all shadow-md"
+                  >
+                    Add Item
+                  </button>
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
+
+export default AddItemForm;
+
