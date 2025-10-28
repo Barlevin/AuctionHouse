@@ -62,10 +62,19 @@ function cleanupOldItems() {
 cron.schedule('0 7 * * *', cleanupOldItems);
 
 // Serve static files from React build folder
-app.use(express.static(path.join(__dirname, "../client/build")));
+const buildPath = path.join(__dirname, "../client/build");
+console.log('Build path:', buildPath);
+console.log('Build path exists:', require('fs').existsSync(buildPath));
+if (require('fs').existsSync(buildPath)) {
+  console.log('Build directory contents:', require('fs').readdirSync(buildPath));
+}
+app.use(express.static(buildPath));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+  const indexPath = path.join(__dirname, "../client/build", "index.html");
+  console.log('Serving index.html from:', indexPath);
+  console.log('Index file exists:', require('fs').existsSync(indexPath));
+  res.sendFile(indexPath);
 });
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
