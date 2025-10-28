@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { X, Plus, MessageCircle } from 'lucide-react';
+import { X, Plus, MessageCircle, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { apiPost } from '../utils/api';
 import toast from 'react-hot-toast';
@@ -18,6 +18,7 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
   });
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showBaseSuggestions, setShowBaseSuggestions] = useState(false);
+  const [showDiscordHelp, setShowDiscordHelp] = useState(false);
 
   const [items,setItems] = useState([  { "type": "Armor", "name": "Helm" },
     { "type": "Armor", "name": "Gauntlets" },
@@ -389,7 +390,31 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
                   <label className="block text-sm font-semibold text-gray-700 mb-1">
                     <MessageCircle className="inline w-4 h-4 mr-1" />
                     Discord Contact
+                    <button
+                      type="button"
+                      onClick={() => setShowDiscordHelp(!showDiscordHelp)}
+                      className="ml-2 inline-flex items-center justify-center w-4 h-4 bg-gray-200 hover:bg-gray-300 rounded-full transition-colors"
+                    >
+                      <HelpCircle className="w-3 h-3 text-gray-600" />
+                    </button>
                   </label>
+                  <AnimatePresence>
+                    {showDiscordHelp && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0, y: -10 }}
+                        animate={{ opacity: 1, height: "auto", y: 0 }}
+                        exit={{ opacity: 0, height: 0, y: -10 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="mb-2 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800 overflow-hidden"
+                      >
+                        <div className="font-semibold mb-1">How to get your Discord User ID:</div>
+                        <div className="space-y-1">
+                          <div>1. Discord → Settings → Advanced → Developer Mode ON</div>
+                          <div>2. Click your name → "Copy User ID"</div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                   <input
                     type="text"
                     name="sellerDiscord"
