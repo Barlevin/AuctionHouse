@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from "react";
-import { ChevronUp, ChevronDown, Search, MessageCircle, Tag, Trash2 } from "lucide-react";
+import { ChevronUp, ChevronDown, Search, MessageCircle, Tag, Trash2, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 
-const Table = ({ data, currentUserId, onDeleteItem }) => {
+const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -167,6 +167,13 @@ const Table = ({ data, currentUserId, onDeleteItem }) => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+        <button
+          onClick={onRefresh}
+          className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 text-sm"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Refresh
+        </button>
         <div className="text-sm text-gray-500 font-medium">
           {filteredData.length} item{filteredData.length !== 1 ? 's' : ''}
         </div>

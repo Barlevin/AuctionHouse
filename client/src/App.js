@@ -24,6 +24,22 @@ const App = () => {
     setItems([...items, newItem]);
   };
 
+  const handleRefresh = async () => {
+    try {
+      setIsLoading(true);
+      const data = await apiGet('/api/items');
+      setItems(data);
+      setError(null);
+      toast.success('Table refreshed successfully!');
+    } catch (e) {
+      setError('Failed to refresh items from server');
+      toast.error('Failed to refresh items');
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleDeleteItem = async (itemId) => {
     try {
       const response = await fetch(`/api/items/${itemId}`, {
@@ -113,6 +129,7 @@ const App = () => {
           data={items} 
           currentUserId={currentUserId}
           onDeleteItem={handleDeleteItem}
+          onRefresh={handleRefresh}
         />
 
         <AddItemForm
