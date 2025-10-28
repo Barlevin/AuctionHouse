@@ -145,4 +145,60 @@ router.delete('/items/:id', function(req, res, next) {
   }
 });
 
+// PUT /api/items/:id - Update an existing item
+router.put('/items/:id', function(req, res, next) {
+  try {
+    const itemId = parseInt(req.params.id);
+    const { name, description, category, price, priceUnit, sellerDiscord, userId, base, rarity, level, quality, class: itemClass } = req.body;
+    
+    // Validate required fields
+    if (!name || !price) {
+      return res.status(400).json({ error: 'Name and price are required' });
+    }
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    const data = readData();
+    const itemIndex = data.items.findIndex(item => item.id === itemId);
+    
+    if (itemIndex === -1) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    
+    const existingItem = data.items[itemIndex];
+    
+    // Check if user owns the item
+    if (existingItem.userId !== userId) {
+      return res.status(403).json({ error: 'You can only edit your own items' });
+    }
+    
+    // Update the item
+    const updatedItem = {
+      ...existingItem,
+      name,
+      description: description || '',
+      category: category || '',
+      price: parseFloat(price),
+      priceUnit: priceUnit === 'm' ? 'm' : 'k',
+      sellerDiscord: sellerDiscord || '',
+      base: base || '',
+      rarity: rarity || '',
+      level: level ? parseInt(level) : null,
+      quality: quality ? parseInt(quality) : null,
+      class: itemClass || '',
+      updatedAt: new Date().toISOString()
+    };
+    
+    data.items[itemIndex] = updatedItem;
+    writeData(data);
+    
+    res.json(updatedItem);
+  } catch (error) {
+    console.error('Error updating item:', error);
+    res.status(500).json({ error: 'Failed to update item' });
+  }
+});
+
 module.exports = router;

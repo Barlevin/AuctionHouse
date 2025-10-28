@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./components/Header";
 import AddItemForm from "./components/AddItemForm";
+import EditItemForm from "./components/EditItemForm";
 import Table from "./pages/Table";
 import { motion } from "framer-motion";
 import { apiGet } from "./utils/api";
@@ -19,9 +20,22 @@ const App = () => {
     return id;
   });
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [itemToEdit, setItemToEdit] = useState(null);
 
   const handleAddItem = (newItem) => {
     setItems([...items, newItem]);
+  };
+
+  const handleEditItem = (item) => {
+    setItemToEdit(item);
+    setShowEditForm(true);
+  };
+
+  const handleUpdateItem = (updatedItem) => {
+    setItems(items.map(item => 
+      item.id === updatedItem.id ? updatedItem : item
+    ));
   };
 
   const handleRefresh = async () => {
@@ -129,6 +143,7 @@ const App = () => {
           data={items} 
           currentUserId={currentUserId}
           onDeleteItem={handleDeleteItem}
+          onEditItem={handleEditItem}
           onRefresh={handleRefresh}
         />
 
@@ -136,6 +151,17 @@ const App = () => {
           isOpen={showAddForm}
           onClose={() => setShowAddForm(false)}
           onAddItem={handleAddItem}
+          userId={currentUserId}
+        />
+
+        <EditItemForm
+          isOpen={showEditForm}
+          onClose={() => {
+            setShowEditForm(false);
+            setItemToEdit(null);
+          }}
+          onUpdateItem={handleUpdateItem}
+          itemToEdit={itemToEdit}
         />
       </main>
     </div>
