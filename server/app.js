@@ -27,9 +27,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// API routes (must come before static file serving)
 app.use('/api', itemsRouter);
+// Note: Not using indexRouter as it would override React routing
+app.use('/users', usersRouter);
 
 // Daily cleanup at 07:00 local time: remove items older than 14 days
 const dataPath = path.join(__dirname, 'data.json');
@@ -60,6 +61,13 @@ function cleanupOldItems() {
 // Schedule: every day at 07:00 local time
 cron.schedule('0 7 * * *', cleanupOldItems);
 
+// Serve static files from React build folder
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+// Handle React routing - return all requests to React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

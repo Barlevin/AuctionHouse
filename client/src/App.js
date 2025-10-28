@@ -26,7 +26,7 @@ const App = () => {
 
   const handleDeleteItem = async (itemId) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/items/${itemId}`, {
+      const response = await fetch(`/api/items/${itemId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
