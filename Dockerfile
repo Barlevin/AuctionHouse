@@ -1,7 +1,13 @@
-# Use Node.js base image
-FROM node:18
+# Stage 1: Build React frontend
+FROM node:18 AS builder
+WORKDIR /app
+COPY client/package*.json ./client/
+RUN cd client && npm install
+COPY client/ ./client
+RUN cd client && npm run build
 
-# Set working directory
+# Stage 2: Setup backend
+FROM node:18
 WORKDIR /app
 
 # Copy server files and install dependencies
@@ -9,14 +15,14 @@ COPY server/package*.json ./server/
 WORKDIR /app/server
 RUN npm install
 
-# Copy the rest of the server code
+# Copy rest of server code
 COPY server/ ./ 
 
-# Copy React build from client
-COPY client/build/ ../client/build/
+# Copy React build from builder
+COPY --from=builder /app/client/build ../client/build/
 
-# Expose the port (Koyeb will provide via PORT env)
+# Expose port
 EXPOSE 3000
 
-# Run the server
+# Start the server
 CMD ["npm", "start"]
