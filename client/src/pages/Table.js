@@ -385,14 +385,14 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
                             className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-semibold transition-colors text-xs sm:text-sm"
                           >
                             <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
-                            <span className="hidden sm:inline">Edit</span>
+                            {/* <span className="hidden sm:inline">Edit</span> */}
                           </button>
                           <button
                             onClick={() => handleDeleteClick(row.id)}
                             className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-semibold transition-colors text-xs sm:text-sm"
                           >
                             <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                            <span className="hidden sm:inline">Delete</span>
+                            {/* <span className="hidden sm:inline">Delete</span> */}
                           </button>
                         </>
                       )}
