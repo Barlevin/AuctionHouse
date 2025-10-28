@@ -60,7 +60,7 @@ router.get('/items', function(req, res, next) {
 // POST /api/items - Add new auction item
 router.post('/items', function(req, res, next) {
   try {
-    const { name, description, category, price, priceUnit, sellerDiscord, userId, base, rarity, level, quality } = req.body;
+    const { name, description, category, price, priceUnit, sellerDiscord, userId, base, rarity, level, quality, class: itemClass } = req.body;
     
     // Validate required fields
     if (!name || !price) {
@@ -81,6 +81,7 @@ router.post('/items', function(req, res, next) {
       rarity: rarity || '',
       level: level ? parseInt(level) : null,
       quality: quality ? parseInt(quality) : null,
+      class: itemClass || '',
       createdAt: new Date().toISOString()
     };
 

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [searchQuery, setSearchQuery] = useState("");
+  const [classFilter, setClassFilter] = useState("");
 
   const handleSort = (accessor) => {
     setSortConfig((prev) => {
@@ -47,14 +48,25 @@ const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
   }, [data, sortConfig]);
 
   const filteredData = useMemo(() => {
-    if (!searchQuery) return sortedData;
-    const lower = searchQuery.toLowerCase();
-    return sortedData.filter((row) =>
-      Object.values(row).some((val) =>
-        String(val).toLowerCase().includes(lower)
-      )
-    );
-  }, [sortedData, searchQuery]);
+    let filtered = sortedData;
+    
+    // Apply search filter
+    if (searchQuery) {
+      const lower = searchQuery.toLowerCase();
+      filtered = filtered.filter((row) =>
+        Object.values(row).some((val) =>
+          String(val).toLowerCase().includes(lower)
+        )
+      );
+    }
+    
+    // Apply class filter
+    if (classFilter) {
+      filtered = filtered.filter((row) => row.class === classFilter);
+    }
+    
+    return filtered;
+  }, [sortedData, searchQuery, classFilter]);
 
   const handleDiscordClick = (sellerDiscord) => {
     if (!sellerDiscord) return;
@@ -156,37 +168,51 @@ const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
       className="bg-white shadow-xl rounded-2xl border border-gray-100 overflow-hidden"
     >
       {/* Search Bar */}
-      <div className="flex items-center gap-2 px-6 py-4 border-b bg-gradient-to-r from-gray-50 to-gray-100">
-        <div className="flex items-center gap-2 flex-1">
-          <Search size={20} className="text-purple-600" />
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 px-4 sm:px-6 py-4 border-b bg-gradient-to-r from-gray-50 to-gray-100">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <Search size={20} className="text-purple-600 flex-shrink-0" />
           <input
             type="text"
-            placeholder="Search items by name, description, category..."
-            className="w-full outline-none bg-transparent text-gray-700 font-medium"
+            placeholder="Search items..."
+            className="w-full outline-none bg-transparent text-gray-700 font-medium text-sm sm:text-base"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <button
-          onClick={onRefresh}
-          className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 text-sm"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </button>
-        <div className="text-sm text-gray-500 font-medium">
-          {filteredData.length} item{filteredData.length !== 1 ? 's' : ''}
+        <div className="flex items-center gap-2 flex-wrap">
+          <select
+            value={classFilter}
+            onChange={(e) => setClassFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 font-medium focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition text-sm min-w-[120px]"
+          >
+            <option value="">All Classes</option>
+            <option value="Warrior">Warrior</option>
+            <option value="Sorcerer">Sorcerer</option>
+            <option value="Rogue">Rogue</option>
+            <option value="Guardian">Guardian</option>
+            <option value="Archer">Archer</option>
+          </select>
+          <button
+            onClick={onRefresh}
+            className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 text-sm whitespace-nowrap"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+          <div className="text-sm text-gray-500 font-medium whitespace-nowrap">
+            {filteredData.length} item{filteredData.length !== 1 ? 's' : ''}
+          </div>
         </div>
       </div>
 
-      <div className="overflow-x-auto max-h-[600px]">
+      <div className="overflow-x-auto overflow-y-auto max-h-[70vh] sm:max-h-[600px]">
         <table className="min-w-full text-left text-sm text-gray-700">
-          <thead className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white sticky top-0">
+          <thead className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white sticky top-0 z-10">
             <tr>
-              <th className="px-6 py-4 font-bold uppercase tracking-wide text-xs">
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs">
                 Item Name
               </th>
-              <th className="px-6 py-4 font-bold uppercase tracking-wide text-xs cursor-pointer hover:bg-purple-700 transition-colors"
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs cursor-pointer hover:bg-purple-700 transition-colors"
                 onClick={() => handleSort('base')}>
                 <div className="flex items-center gap-1">
                   Base
@@ -199,10 +225,23 @@ const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
                   )}
                 </div>
               </th>
-              <th className="px-6 py-4 font-bold uppercase tracking-wide text-xs">
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs">
                 Category
               </th>
-              <th className="px-6 py-4 font-bold uppercase tracking-wide text-xs cursor-pointer hover:bg-purple-700 transition-colors"
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs cursor-pointer hover:bg-purple-700 transition-colors"
+                onClick={() => handleSort('class')}>
+                <div className="flex items-center gap-1">
+                  Class
+                  {sortConfig.key === 'class' && (
+                    sortConfig.direction === "asc" ? (
+                      <ChevronUp size={14} />
+                    ) : (
+                      <ChevronDown size={14} />
+                    )
+                  )}
+                </div>
+              </th>
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs cursor-pointer hover:bg-purple-700 transition-colors"
                 onClick={() => handleSort('rarity')}>
                 <div className="flex items-center gap-1">
                   Rarity
@@ -215,13 +254,13 @@ const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
                   )}
                 </div>
               </th>
-              <th className="px-6 py-4 font-bold uppercase tracking-wide text-xs">
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs">
                 Level
               </th>
-              <th className="px-6 py-4 font-bold uppercase tracking-wide text-xs">
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs">
                 Quality
               </th>
-              <th className="px-6 py-4 font-bold uppercase tracking-wide text-xs cursor-pointer hover:bg-purple-700 transition-colors"
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs cursor-pointer hover:bg-purple-700 transition-colors"
                 onClick={() => handleSort('price')}>
                 <div className="flex items-center gap-1">
                   Price
@@ -234,10 +273,10 @@ const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
                   )}
                 </div>
               </th>
-              <th className="px-6 py-4 font-bold uppercase tracking-wide text-xs text-center">
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs text-center">
                 Contact
               </th>
-              <th className="px-6 py-4 font-bold uppercase tracking-wide text-xs text-center">
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs text-center">
                 Actions
               </th>
             </tr>
@@ -246,7 +285,7 @@ const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
             {filteredData.length === 0 ? (
               <tr>
                 <td
-                  colSpan={9}
+                  colSpan={10}
                   className="text-center py-12 text-gray-400"
                 >
                   <div className="flex flex-col items-center gap-2">
@@ -265,24 +304,30 @@ const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
                   transition={{ delay: i * 0.05 }}
                   className="hover:bg-purple-50 transition-colors border-b border-gray-100"
                 >
-                  <td className="px-6 py-4">
-                    <div className="font-bold text-gray-900">{row.name}</div>
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
+                    <div className="font-bold text-gray-900 text-sm sm:text-base">{row.name}</div>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className="text-gray-700 font-semibold">
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
+                    <span className="text-gray-700 font-semibold text-sm">
                       {row.base || '-'}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
                     {row.category && (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
+                      <span className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
                         <Tag className="w-3 h-3" />
-                        {row.category}
+                        <span className="hidden sm:inline">{row.category}</span>
+                        <span className="sm:hidden">{row.category.charAt(0)}</span>
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`font-semibold ${
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
+                    <span className="bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent font-semibold text-sm">
+                      {row.class || '-'}
+                    </span>
+                  </td>
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
+                    <span className={`font-semibold text-sm ${
                       row.rarity === 'Excellent' 
                         ? 'bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent' 
                         : 'bg-gradient-to-r from-gray-500 to-gray-700 bg-clip-text text-transparent'
@@ -290,8 +335,8 @@ const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
                       {row.rarity || '-'}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`font-semibold ${
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
+                    <span className={`font-semibold text-sm ${
                       row.level == 10 
                         ? 'bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent' 
                         : 'bg-gradient-to-r from-gray-500 to-gray-700 bg-clip-text text-transparent'
@@ -299,8 +344,8 @@ const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
                       {row.level || '-'}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`font-semibold ${
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
+                    <span className={`font-semibold text-sm ${
                       row.quality == 100 
                         ? 'bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent' 
                         : 'bg-gradient-to-r from-gray-500 to-gray-700 bg-clip-text text-transparent'
@@ -308,37 +353,38 @@ const Table = ({ data, currentUserId, onDeleteItem, onRefresh }) => {
                       {row.quality ? `${row.quality}%` : '-'}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
                     <div className="flex items-center justify-center">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 text-emerald-800 font-bold text-sm">
+                      <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 text-emerald-800 font-bold text-xs sm:text-sm">
                         {formatCompact(row.price, row.priceUnit)}
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
                     <div className="flex justify-center">
                       {row.sellerDiscord ? (
                         <button
                           onClick={() => handleDiscordClick(row.sellerDiscord)}
-                          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105"
+                          className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 text-xs sm:text-sm"
                         >
-                          <MessageCircle className="w-5 h-5" />
-                          Contact on Discord
+                          <MessageCircle className="w-3 h-3 sm:w-5 sm:h-5" />
+                          <span className="hidden sm:inline">Contact on Discord</span>
+                          <span className="sm:hidden">Contact</span>
                         </button>
                       ) : (
-                        <span className="text-gray-400 text-sm">No contact</span>
+                        <span className="text-gray-400 text-xs sm:text-sm">No contact</span>
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
                     <div className="flex justify-center">
                       {row.userId === currentUserId && (
                         <button
                           onClick={() => handleDeleteClick(row.id)}
-                          className="flex items-center gap-1 px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-semibold transition-colors text-sm"
+                          className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-semibold transition-colors text-xs sm:text-sm"
                         >
-                          <Trash2 className="w-4 h-4" />
-                          Delete
+                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span className="hidden sm:inline">Delete</span>
                         </button>
                       )}
                     </div>

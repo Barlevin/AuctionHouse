@@ -9,6 +9,7 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
     base: '',
     name: '',
     rarity: '',
+    class: '',
     level: '',
     quality: '',
     price: '',
@@ -25,39 +26,39 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
     { "type": "Armor", "name": "Platelegs" },
     { "type": "Armor", "name": "Shield" },
   
-    { "type": "Armor", "name": "Thread Helm" },
-    { "type": "Armor", "name": "Thread Gloves" },
-    { "type": "Armor", "name": "Thread Boots" },
-    { "type": "Armor", "name": "Thread Top" },
-    { "type": "Armor", "name": "Thread Bottom" },
-    { "type": "Armor", "name": "Gilded Spellbook" },
+    { "class": "Sorcerer", "type": "Armor", "name": "Thread Helm" },
+    { "class": "Sorcerer", "type": "Armor", "name": "Thread Gloves" },
+    { "class": "Sorcerer", "type": "Armor", "name": "Thread Boots" },
+    { "class": "Sorcerer", "type": "Armor", "name": "Thread Top" },
+    { "class": "Sorcerer", "type": "Armor", "name": "Thread Bottom" },
+    { "class": "Sorcerer", "type": "Armor", "name": "Gilded Spellbook" },
   
-    { "type": "Weapon", "name": "Bardiche" },
-    { "type": "Weapon", "name": "Battleaxe" },
-    { "type": "Weapon", "name": "Mace" },
-    { "type": "Weapon", "name": "Warhammer" },
-    { "type": "Weapon", "name": "Widesword" },
+    { "class": "Guardian", "type": "Weapon", "name": "Bardiche" },
+    { "class": "Guardian", "type": "Weapon", "name": "Battleaxe" },
+    { "class": "Guardian", "type": "Weapon", "name": "Mace" },
+    { "class": "Guardian", "type": "Weapon", "name": "Warhammer" },
+    { "class": "Guardian", "type": "Weapon", "name": "Widesword" },
   
-    { "type": "Weapon", "name": "Curved Dagger" },
-    { "type": "Weapon", "name": "Dagger" },
-    { "type": "Weapon", "name": "Short Sword" },
-    { "type": "Weapon", "name": "Sword" },
+    { "class": "Rogue", "type": "Weapon", "name": "Curved Dagger" },
+    { "class": "Rogue", "type": "Weapon", "name": "Dagger" },
+    { "class": "Rogue", "type": "Weapon", "name": "Short Sword" },
+    { "class": "Rogue", "type": "Weapon", "name": "Sword" },
   
-    { "type": "Weapon", "name": "Broadsword" },
-    { "type": "Weapon", "name": "Claymore" },
-    { "type": "Weapon", "name": "Halberd" },
-    { "type": "Weapon", "name": "Longsword" },
-    { "type": "Weapon", "name": "Trident" },
+    { "class": "Warrior", "type": "Weapon", "name": "Broadsword" },
+    { "class": "Warrior", "type": "Weapon", "name": "Claymore" },
+    { "class": "Warrior", "type": "Weapon", "name": "Halberd" },
+    { "class": "Warrior", "type": "Weapon", "name": "Longsword" },
+    { "class": "Warrior", "type": "Weapon", "name": "Trident" },
   
-    { "type": "Weapon", "name": "Arcane Staff" },
-    { "type": "Weapon", "name": "Fire Staff" },
-    { "type": "Weapon", "name": "Ice Staff" },
-    { "type": "Weapon", "name": "Thunder Staff" },
+    { "class": "Sorcerer", "type": "Weapon", "name": "Arcane Staff" },
+    { "class": "Sorcerer", "type": "Weapon", "name": "Fire Staff" },
+    { "class": "Sorcerer", "type": "Weapon", "name": "Ice Staff" },
+    { "class": "Sorcerer", "type": "Weapon", "name": "Thunder Staff" },
   
-    { "type": "Weapon", "name": "Composite Bow" },
-    { "type": "Weapon", "name": "Longbow" },
-    { "type": "Weapon", "name": "Recurve Bow" },
-    { "type": "Weapon", "name": "Shortbow" }]);
+    { "class": "Archer", "type": "Weapon", "name": "Composite Bow" },
+    { "class": "Archer", "type": "Weapon", "name": "Longbow" },
+    { "class": "Archer", "type": "Weapon", "name": "Recurve Bow" },
+    { "class": "Archer", "type": "Weapon", "name": "Shortbow" }]);
 
   const [baseItems] = useState([
     // Base materials
@@ -135,6 +136,7 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
           base: '',
           name: '',
           rarity: '',
+          class: '',
           level: '',
           quality: '',
           price: '',
@@ -292,7 +294,26 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
                     <option value="">Select Rarity</option>
                     <option value="Normal">Normal</option>
                     <option value="Excellent">Excellent</option>
-                    <option value="Cosmetic">Cosmetic</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Class *
+                  </label>
+                  <select
+                    name="class"
+                    value={formData.class}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                  >
+                    <option value="">Select Class</option>
+                    <option value="Warrior">Warrior</option>
+                    <option value="Sorcerer">Sorcerer</option>
+                    <option value="Rogue">Rogue</option>
+                    <option value="Guardian">Guardian</option>
+                    <option value="Archer">Archer</option>
                   </select>
                 </div>
 
