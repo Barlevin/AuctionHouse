@@ -186,11 +186,13 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
             className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 font-medium focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition text-sm min-w-[120px]"
           >
             <option value="">All Classes</option>
+            <option value="Melee">Melee</option>
             <option value="Warrior">Warrior</option>
             <option value="Sorcerer">Sorcerer</option>
             <option value="Rogue">Rogue</option>
             <option value="Guardian">Guardian</option>
             <option value="Archer">Archer</option>
+            <option value="All">All</option>
           </select>
           <button
             onClick={onRefresh}
@@ -225,6 +227,9 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
               </th>
               <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs">
                 Item Name
+              </th>
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs">
+                IGN
               </th>
               <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs">
                 Category
@@ -275,9 +280,6 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
                 </div>
               </th>
               <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs text-center">
-                Contact
-              </th>
-              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs text-center">
                 Actions
               </th>
             </tr>
@@ -313,6 +315,9 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
                   </td>
                   <td className="px-2 sm:px-6 py-3 sm:py-4">
                     <div className="font-bold text-gray-900 text-sm sm:text-base">{row.name}</div>
+                  </td>
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
+                    <span className="text-gray-600 text-sm">{row.ign || '-'}</span>
                   </td>
                   <td className="px-2 sm:px-6 py-3 sm:py-4">
                     {row.category && (
@@ -363,39 +368,50 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
                     </div>
                   </td>
                   <td className="px-2 sm:px-6 py-3 sm:py-4">
-                    <div className="flex justify-center">
-                      {row.sellerDiscord ? (
-                        <button
-                          onClick={() => handleDiscordClick(row.sellerDiscord)}
-                          className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 text-xs sm:text-sm"
-                        >
-                          <MessageCircle className="w-3 h-3 sm:w-5 sm:h-5" />
-                          <span className="hidden sm:inline">Discord</span>
-                          <span className="sm:hidden">Discord</span>
-                        </button>
-                      ) : (
-                        <span className="text-gray-400 text-xs sm:text-sm">No contact</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-2 sm:px-6 py-3 sm:py-4">
                     <div className="flex justify-center gap-2">
+                      {row.sellerDiscord && (
+                        <div className="relative group">
+                          <button
+                            onClick={() => handleDiscordClick(row.sellerDiscord)}
+                            className="flex items-center justify-center p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105"
+                            title="Contact on Discord"
+                          >
+                            <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                          </button>
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+                            Contact on Discord
+                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                          </div>
+                        </div>
+                      )}
                       {row.userId === currentUserId && (
                         <>
-                          <button
-                            onClick={() => onEditItem(row)}
-                            className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-semibold transition-colors text-xs sm:text-sm"
-                          >
-                            <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
-                            {/* <span className="hidden sm:inline">Edit</span> */}
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(row.id)}
-                            className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-semibold transition-colors text-xs sm:text-sm"
-                          >
-                            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                            {/* <span className="hidden sm:inline">Delete</span> */}
-                          </button>
+                          <div className="relative group">
+                            <button
+                              onClick={() => onEditItem(row)}
+                              className="flex items-center justify-center p-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors"
+                              title="Edit Item"
+                            >
+                              <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
+                            </button>
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+                              Edit Item
+                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                            </div>
+                          </div>
+                          <div className="relative group">
+                            <button
+                              onClick={() => handleDeleteClick(row.id)}
+                              className="flex items-center justify-center p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors"
+                              title="Delete Item"
+                            >
+                              <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                            </button>
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+                              Delete Item
+                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
+                            </div>
+                          </div>
                         </>
                       )}
                     </div>

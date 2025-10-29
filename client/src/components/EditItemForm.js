@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 
 const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
   const [formData, setFormData] = useState({
+    ign: '',
     base: '',
     name: '',
     rarity: '',
@@ -21,12 +22,14 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDiscordHelp, setShowDiscordHelp] = useState(false);
 
-  const [items,setItems] = useState([  { "type": "Armor", "name": "Helm" },
+  const [items,setItems] = useState([  
+    { "type": "Armor", "name": "Helm" },
     { "type": "Armor", "name": "Gauntlets" },
     { "type": "Armor", "name": "Greaves" },
     { "type": "Armor", "name": "Platemail" },
     { "type": "Armor", "name": "Platelegs" },
     { "type": "Armor", "name": "Shield" },
+    { "type": "Armor", "name": "Quiver" },
   
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Helm" },
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Gloves" },
@@ -57,6 +60,7 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
     { "class": "Archer", "type": "Weapon", "name": "Crossbow" },
     { "class": "Archer", "type": "Weapon", "name": "Longbow" },
     { "class": "Archer", "type": "Weapon", "name": "Shortbow" },
+
   
     { "type": "Ring", "name": "Ring" },
     { "type": "Amulet", "name": "Amulet" },
@@ -85,6 +89,7 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
   useEffect(() => {
     if (itemToEdit) {
       setFormData({
+        ign: itemToEdit.ign || '',
         base: itemToEdit.base || '',
         name: itemToEdit.name || '',
         rarity: itemToEdit.rarity || '',
@@ -284,6 +289,21 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
                   )}
                 </div>
 
+                {/* IGN Input */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    IGN (In-Game Name)
+                  </label>
+                  <input
+                    type="text"
+                    name="ign"
+                    value={formData.ign}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                    placeholder="Enter your in-game name..."
+                  />
+                </div>
+
                 {/* Item Name Input */}
                 <div className="relative">
                   <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -353,6 +373,7 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
                 >
                   <option value="">Select Class</option>
                   <option value="All">All</option>
+                  <option value="Melee">Melee</option>
                   <option value="Warrior">Warrior</option>
                   <option value="Sorcerer">Sorcerer</option>
                   <option value="Rogue">Rogue</option>

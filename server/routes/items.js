@@ -60,7 +60,7 @@ router.get('/items', function(req, res, next) {
 // POST /api/items - Add new auction item
 router.post('/items', function(req, res, next) {
   try {
-    const { name, description, category, price, priceUnit, sellerDiscord, userId, base, rarity, level, quality, class: itemClass } = req.body;
+    const { ign, name, description, category, price, priceUnit, sellerDiscord, userId, base, rarity, level, quality, class: itemClass } = req.body;
     
     // Validate required fields
     if (!name || !price) {
@@ -70,6 +70,7 @@ router.post('/items', function(req, res, next) {
     const data = readData();
     const newItem = {
       id: Date.now(), // Simple ID generation
+      ign: ign || '',
       name,
       description: description || '',
       category: category || '',
@@ -149,7 +150,7 @@ router.delete('/items/:id', function(req, res, next) {
 router.put('/items/:id', function(req, res, next) {
   try {
     const itemId = parseInt(req.params.id);
-    const { name, description, category, price, priceUnit, sellerDiscord, userId, base, rarity, level, quality, class: itemClass } = req.body;
+    const { ign, name, description, category, price, priceUnit, sellerDiscord, userId, base, rarity, level, quality, class: itemClass } = req.body;
     
     // Validate required fields
     if (!name || !price) {
@@ -177,6 +178,7 @@ router.put('/items/:id', function(req, res, next) {
     // Update the item
     const updatedItem = {
       ...existingItem,
+      ign: ign || '',
       name,
       description: description || '',
       category: category || '',

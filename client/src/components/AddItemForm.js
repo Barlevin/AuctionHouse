@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 
 const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
   const [formData, setFormData] = useState({
+    ign: '',
     base: '',
     name: '',
     rarity: '',
@@ -196,23 +197,24 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
           return;
         }
         const newItem = await apiPost('/api/items', {
-          ...formData,
+        ...formData,
           category: itemCategory,
           userId,
         });
-        onAddItem(newItem);
+      onAddItem(newItem);
         toast.success('Item added successfully!');
-        setFormData({
+      setFormData({
+          ign: '',
           base: '',
-          name: '',
+        name: '',
           rarity: '',
           class: '',
           level: '',
           quality: '',
-          price: '',
-          sellerDiscord: '',
-        });
-        onClose();
+        price: '',
+        sellerDiscord: '',
+      });
+      onClose();
       } catch (err) {
         toast.error(err.message || 'Failed to add item');
       }
@@ -304,6 +306,19 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    IGN (In-Game Name)
+                  </label>
+                  <input
+                    type="text"
+                    name="ign"
+                    value={formData.ign}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                    placeholder="Enter your in-game name..."
+                  />
+                </div>
               <div className="relative">
                   <label className="block text-sm font-semibold text-gray-700 mb-1">
                     Item Name *
@@ -403,6 +418,7 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
                   >
                     <option value="">Select Class</option>
                     <option value="All">All</option>
+                    <option value="Melee">Melee</option>
                     <option value="Warrior">Warrior</option>
                     <option value="Sorcerer">Sorcerer</option>
                     <option value="Rogue">Rogue</option>
