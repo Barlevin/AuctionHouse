@@ -576,7 +576,8 @@
       "level": null,
       "quality": null,
       "class": "Sorcerer",
-      "createdAt": "2025-10-29T21:06:00.336Z"
+      "createdAt": "2025-10-29T21:06:00.336Z",
+      "updatedAt": "2025-10-29T21:28:13.180Z"
     }
   ]
 }

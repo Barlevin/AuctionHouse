@@ -22,14 +22,13 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDiscordHelp, setShowDiscordHelp] = useState(false);
 
-  const [items,setItems] = useState([  
-    { "type": "Armor", "name": "Helm" },
-    { "type": "Armor", "name": "Gauntlets" },
-    { "type": "Armor", "name": "Greaves" },
-    { "type": "Armor", "name": "Platemail" },
-    { "type": "Armor", "name": "Platelegs" },
-    { "type": "Armor", "name": "Shield" },
-    { "type": "Armor", "name": "Quiver" },
+  
+  const [items,setItems] = useState([  { "type": "Armor", "name": "Helm" },
+    { "class": "Melee", "type": "Armor", "name": "Gauntlets" },
+    { "class": "Melee", "type": "Armor", "name": "Greaves" },
+    { "class": "Melee", "type": "Armor", "name": "Platemail" },
+    { "class": "Melee", "type": "Armor", "name": "Platelegs" },
+    { "class": "Melee", "type": "Armor", "name": "Shield" },
   
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Helm" },
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Gloves" },
@@ -53,19 +52,72 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
     { "class": "Warrior", "type": "Weapon", "name": "Claymore" },
     { "class": "Warrior", "type": "Weapon", "name": "Halberd" },
     { "class": "Warrior", "type": "Weapon", "name": "Longsword" },
-    { "class": "Warrior", "type": "Weapon", "name": "Spear" },
-    { "class": "Warrior", "type": "Weapon", "name": "Two-Handed Sword" },
+    { "class": "Warrior", "type": "Weapon", "name": "Trident" },
   
-    { "class": "Archer", "type": "Weapon", "name": "Bow" },
-    { "class": "Archer", "type": "Weapon", "name": "Crossbow" },
+    { "class": "Sorcerer", "type": "Weapon", "name": "Arcane Staff" },
+    { "class": "Sorcerer", "type": "Weapon", "name": "Fire Staff" },
+    { "class": "Sorcerer", "type": "Weapon", "name": "Ice Staff" },
+    { "class": "Sorcerer", "type": "Weapon", "name": "Thunder Staff" },
+  
+    { "class": "Archer", "type": "Weapon", "name": "Composite Bow" },
     { "class": "Archer", "type": "Weapon", "name": "Longbow" },
+    { "class": "Archer", "type": "Weapon", "name": "Recurve Bow" },
     { "class": "Archer", "type": "Weapon", "name": "Shortbow" },
 
+    { "class": "All", "type": "Amulet", "name": "Amulet Heal I" },
+    { "class": "All", "type": "Amulet", "name": "AmuletHeal II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Heal III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Heal IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Heal V" },
+
+    { "class": "All", "type": "Amulet", "name": "Amulet Fire Explosion I" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Fire Explosion II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Fire Explosion III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Fire Explosion IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Fire Explosion V" },
+
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Blindness I" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Blindness II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Blindness III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Blindness IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Blindness V" },
+
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Slow I" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Slow II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Slow III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Slow IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Slow V" },
+
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Poison I" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Poison II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Poison III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Poison IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Poison V" },
+
+    { "class": "All", "type": "Amulet", "name": "Amulet Resist Stun I" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Resist Stun II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Resist Stun III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Resist Stun IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Resist Stun V" },
+
+    { "class": "All", "type": "Ring", "name": "Ring Tier I" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier II" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier III" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier IV" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier V" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier VI" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier VII" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier VIII" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier IX" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier X" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier XI" },  
+    { "class": "All", "type": "Ring", "name": "Ring Tier XII" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier XIII" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier XIV" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier XV" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier XVI" }
+
   
-    { "type": "Ring", "name": "Ring" },
-    { "type": "Amulet", "name": "Amulet" },
-    { "type": "Cape", "name": "Cape" },
-    { "type": "Cosmetic", "name": "Cosmetic" }
   ]);
 
   const baseItems = [
