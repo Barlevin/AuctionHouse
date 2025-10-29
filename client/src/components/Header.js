@@ -8,7 +8,7 @@ const Header = ({ onAddItemClick }) => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-800 text-white shadow-lg"
+      className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-800 text-white shadow-lg overflow-x-hidden w-full"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">

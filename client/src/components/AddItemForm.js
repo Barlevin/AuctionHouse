@@ -21,11 +21,11 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
   const [showDiscordHelp, setShowDiscordHelp] = useState(false);
 
   const [items,setItems] = useState([  { "type": "Armor", "name": "Helm" },
-    { "type": "Armor", "name": "Gauntlets" },
-    { "type": "Armor", "name": "Greaves" },
-    { "type": "Armor", "name": "Platemail" },
-    { "type": "Armor", "name": "Platelegs" },
-    { "type": "Armor", "name": "Shield" },
+    { "class": "Melee", "type": "Armor", "name": "Gauntlets" },
+    { "class": "Melee", "type": "Armor", "name": "Greaves" },
+    { "class": "Melee", "type": "Armor", "name": "Platemail" },
+    { "class": "Melee", "type": "Armor", "name": "Platelegs" },
+    { "class": "Melee", "type": "Armor", "name": "Shield" },
   
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Helm" },
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Gloves" },
@@ -59,18 +59,87 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
     { "class": "Archer", "type": "Weapon", "name": "Composite Bow" },
     { "class": "Archer", "type": "Weapon", "name": "Longbow" },
     { "class": "Archer", "type": "Weapon", "name": "Recurve Bow" },
-    { "class": "Archer", "type": "Weapon", "name": "Shortbow" }]);
+    { "class": "Archer", "type": "Weapon", "name": "Shortbow" },
+
+    { "class": "All", "type": "Amulet", "name": "Amulet Heal I" },
+    { "class": "All", "type": "Amulet", "name": "AmuletHeal II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Heal III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Heal IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Heal V" },
+
+    { "class": "All", "type": "Amulet", "name": "Amulet Fire Explosion I" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Fire Explosion II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Fire Explosion III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Fire Explosion IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Fire Explosion V" },
+
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Blindness I" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Blindness II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Blindness III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Blindness IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Blindness V" },
+
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Slow I" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Slow II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Slow III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Slow IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Slow V" },
+
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Poison I" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Poison II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Poison III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Poison IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Cure Poison V" },
+
+    { "class": "All", "type": "Amulet", "name": "Amulet Resist Stun I" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Resist Stun II" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Resist Stun III" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Resist Stun IV" },
+    { "class": "All", "type": "Amulet", "name": "Amulet Resist Stun V" },
+
+    { "class": "All", "type": "Ring", "name": "Ring Tier I" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier II" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier III" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier IV" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier V" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier VI" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier VII" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier VIII" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier IX" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier X" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier XI" },  
+    { "class": "All", "type": "Ring", "name": "Ring Tier XII" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier XIII" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier XIV" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier XV" },
+    { "class": "All", "type": "Ring", "name": "Ring Tier XVI" }
+
+  
+  ]);
+    
+    
 
   const [baseItems] = useState([
     // Base materials
     "Bronze", "Steel", "Sunstone", "Bloodchrome", "Meteor", "Onyx", "Lypriptite", "Azurite", "Emerald", "Citrine", "Kunzite", "Aquamarine", "Jade", "Zircon", "Topaz", "Rhodonite",
     // Remnant
-    "Spiderfang", "Ghostly", "Fireborn", "Bone", "Pharaoh's", "Frozen", "Frostbite", "Scorched", "Defiled", "Dark Sea", "Empty", "Valiant", "Flarium", "Ominous", "Dark", "Abyssal", "Void",
+    "Spiderfang", "Ghostly", "Fireborn", "Bone", "Pharaoh's", "Frozen", "Frostbite", "Scorched", "Defiled", "Dark Sea", "Valiant", "Flarium", "Ominous", "Dark", "Abyssal", "Void",
     // Spoils
     "Scavenge", "Perpetual", "Famine",
     // Trials
-    "Wintertide", "Azure Break", "Fatebringer", "Everfrost", "Umbral"
+    "Wintertide", "Azure Break", "Fatebringer", "Everfrost", "Umbral",
+    // Accessories
+    "Accessories"
   ]);
+
+  // Check if selected item is Ring or Amulet
+  const selectedItem = useMemo(() => {
+    return items.find(item => item.name === formData.name);
+  }, [formData.name, items]);
+
+  const isAccessoryItem = useMemo(() => {
+    return selectedItem && (selectedItem.type === 'Ring' || selectedItem.type === 'Amulet');
+  }, [selectedItem]);
   const userId = (() => {
     let id = localStorage.getItem('auction_user_id');
     if (!id) {
@@ -85,7 +154,7 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
     const query = formData.name.toLowerCase();
     return items
       .filter(item => item.name.toLowerCase().includes(query))
-      .slice(0, 5); // Limit to 5 suggestions
+      .slice(0, 25); // Limit to 25 suggestions
   }, [formData.name, items]);
 
   const filteredBaseItems = useMemo(() => {
@@ -152,22 +221,38 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    
+    // If name changed, check if it's a Ring/Amulet and auto-set base/class
     if (name === 'name') {
+      const selectedItem = items.find(item => item.name === value);
+      const isAccessory = selectedItem && (selectedItem.type === 'Ring' || selectedItem.type === 'Amulet');
+      
+      setFormData({
+        ...formData,
+        [name]: value,
+        ...(isAccessory ? { base: 'Accessories', class: 'All' } : {}),
+      });
       setShowSuggestions(value.length >= 2);
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
     }
+    
     if (name === 'base') {
       setShowBaseSuggestions(value.length >= 2);
     }
   };
 
   const handleSuggestionClick = (itemName) => {
+    const selectedItem = items.find(item => item.name === itemName);
+    const isAccessory = selectedItem && (selectedItem.type === 'Ring' || selectedItem.type === 'Amulet');
+    
     setFormData({
       ...formData,
       name: itemName,
+      ...(isAccessory ? { base: 'Accessories', class: 'All' } : {}),
     });
     setShowSuggestions(false);
   };
@@ -219,6 +304,36 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div className="relative">
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Item Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    onFocus={() => setShowSuggestions(formData.name.length >= 2)}
+                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                  />
+                  {showSuggestions && filteredItems.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-[500px] overflow-y-auto">
+                      {filteredItems.map((item, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => handleSuggestionClick(item.name)}
+                          className="w-full px-4 py-2 text-left hover:bg-purple-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                        >
+                          <div className="font-medium text-gray-900">{item.name}</div>
+                          <div className="text-sm text-gray-500">{item.type}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="relative">
                   <label className="block text-sm font-semibold text-gray-700 mb-1">
                     Base *
@@ -228,13 +343,16 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
                     name="base"
                     value={formData.base}
                     onChange={handleChange}
-                    onFocus={() => setShowBaseSuggestions(formData.base.length >= 2)}
+                    onFocus={() => !isAccessoryItem && setShowBaseSuggestions(formData.base.length >= 2)}
                     onBlur={() => setTimeout(() => setShowBaseSuggestions(false), 200)}
                     required
+                    disabled={isAccessoryItem}
                     placeholder="e.g. Steel, Bronze, Void..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition ${
+                      isAccessoryItem ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''
+                    }`}
                   />
-                  {showBaseSuggestions && filteredBaseItems.length > 0 && (
+                  {showBaseSuggestions && filteredBaseItems.length > 0 && !isAccessoryItem && (
                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                       {filteredBaseItems.map((item, index) => (
                         <button
@@ -250,36 +368,7 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
                   )}
                 </div>
 
-                <div className="relative">
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    Item Name *
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    onFocus={() => setShowSuggestions(formData.name.length >= 2)}
-                    onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
-                  />
-                  {showSuggestions && filteredItems.length > 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                      {filteredItems.map((item, index) => (
-                        <button
-                          key={index}
-                          type="button"
-                          onClick={() => handleSuggestionClick(item.name)}
-                          className="w-full px-4 py-2 text-left hover:bg-purple-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
-                        >
-                          <div className="font-medium text-gray-900">{item.name}</div>
-                          <div className="text-sm text-gray-500">{item.type}</div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -307,9 +396,13 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
                     value={formData.class}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                    disabled={isAccessoryItem}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition ${
+                      isAccessoryItem ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''
+                    }`}
                   >
                     <option value="">Select Class</option>
+                    <option value="All">All</option>
                     <option value="Warrior">Warrior</option>
                     <option value="Sorcerer">Sorcerer</option>
                     <option value="Rogue">Rogue</option>

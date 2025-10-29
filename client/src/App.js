@@ -95,7 +95,7 @@ const App = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 overflow-x-hidden w-full max-w-full">
       <Toaster 
         position="top-right"
         toastOptions={{
@@ -124,7 +124,7 @@ const App = () => {
         onAddItemClick={() => setShowAddForm(true)}
       />
 
-      <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8 overflow-x-hidden w-full">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

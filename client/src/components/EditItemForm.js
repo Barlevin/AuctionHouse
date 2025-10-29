@@ -68,8 +68,18 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
     "Bronze", "Steel", "Sunstone", "Bloodchrome", "Meteor", "Onyx", "Lypriptite", "Azurite", "Emerald", "Citrine", "Kunzite", "Aquamarine", "Jade", "Zircon", "Topaz", "Rhodonite",
     "Remnant", "Spiderfang", "Ghostly", "Fireborn", "Bone", "Pharaoh's", "Frozen", "Frostbite", "Scorched", "Defiled", "Dark Sea", "Empty", "Valiant", "Flarium", "Ominous", "Dark", "Abyssal", "Void",
     "Spoils", "Scavenge", "Perpetual", "Famine",
-    "Trials", "Wintertide", "Azure Break", "Fatebringer", "Everfrost", "Umbral"
+    "Trials", "Wintertide", "Azure Break", "Fatebringer", "Everfrost", "Umbral",
+    "Accessories"
   ];
+
+  // Check if selected item is Ring or Amulet
+  const selectedItem = useMemo(() => {
+    return items.find(item => item.name === formData.name);
+  }, [formData.name, items]);
+
+  const isAccessoryItem = useMemo(() => {
+    return selectedItem && (selectedItem.type === 'Ring' || selectedItem.type === 'Amulet');
+  }, [selectedItem]);
 
   // Pre-fill form data when itemToEdit changes
   useEffect(() => {
@@ -92,7 +102,7 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
     if (!formData.name) return [];
     return items.filter(item =>
       item.name.toLowerCase().includes(formData.name.toLowerCase())
-    ).slice(0, 5);
+    ).slice(0, 25);
   }, [formData.name, items]);
 
   const filteredBaseItems = useMemo(() => {
@@ -104,16 +114,32 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // If name changed, check if it's a Ring/Amulet and auto-set base/class
+    if (name === 'name') {
+      const selectedItem = items.find(item => item.name === value);
+      const isAccessory = selectedItem && (selectedItem.type === 'Ring' || selectedItem.type === 'Amulet');
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        ...(isAccessory ? { base: 'Accessories', class: 'All' } : {}),
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleSuggestionClick = (item) => {
+    const isAccessory = item.type === 'Ring' || item.type === 'Amulet';
+    
     setFormData(prev => ({
       ...prev,
-      name: item.name
+      name: item.name,
+      ...(isAccessory ? { base: 'Accessories', class: 'All' } : {}),
     }));
     setShowSuggestions(false);
   };
@@ -234,12 +260,15 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
                     name="base"
                     value={formData.base}
                     onChange={handleChange}
-                    onFocus={() => setShowBaseSuggestions(true)}
+                    onFocus={() => !isAccessoryItem && setShowBaseSuggestions(true)}
                     onBlur={() => setTimeout(() => setShowBaseSuggestions(false), 200)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                    disabled={isAccessoryItem}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition ${
+                      isAccessoryItem ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''
+                    }`}
                     placeholder="Enter base material..."
                   />
-                  {showBaseSuggestions && filteredBaseItems.length > 0 && (
+                  {showBaseSuggestions && filteredBaseItems.length > 0 && !isAccessoryItem && (
                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
                       {filteredBaseItems.map((base, index) => (
                         <button
@@ -272,7 +301,7 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
                     placeholder="Enter item name..."
                   />
                   {showSuggestions && filteredItems.length > 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-[500px] overflow-y-auto">
                       {filteredItems.map((item, index) => (
                         <button
                           key={index}
@@ -317,9 +346,13 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
                   value={formData.class}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
+                  disabled={isAccessoryItem}
+                  className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition ${
+                    isAccessoryItem ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''
+                  }`}
                 >
                   <option value="">Select Class</option>
+                  <option value="All">All</option>
                   <option value="Warrior">Warrior</option>
                   <option value="Sorcerer">Sorcerer</option>
                   <option value="Rogue">Rogue</option>

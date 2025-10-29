@@ -165,7 +165,7 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="bg-white shadow-xl rounded-2xl border border-gray-100 overflow-hidden"
+      className="bg-white shadow-xl rounded-2xl border border-gray-100 overflow-hidden w-full max-w-full"
     >
       {/* Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 px-4 sm:px-6 py-4 border-b bg-gradient-to-r from-gray-50 to-gray-100">
@@ -209,9 +209,7 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
         <table className="min-w-full text-left text-sm text-gray-700">
           <thead className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white sticky top-0 z-10">
             <tr>
-              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs">
-                Item Name
-              </th>
+           
               <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs cursor-pointer hover:bg-purple-700 transition-colors"
                 onClick={() => handleSort('base')}>
                 <div className="flex items-center gap-1">
@@ -224,6 +222,9 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
                     )
                   )}
                 </div>
+              </th>
+              <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs">
+                Item Name
               </th>
               <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs">
                 Category
@@ -304,13 +305,14 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
                   transition={{ delay: i * 0.05 }}
                   className="hover:bg-purple-50 transition-colors border-b border-gray-100"
                 >
-                  <td className="px-2 sm:px-6 py-3 sm:py-4">
-                    <div className="font-bold text-gray-900 text-sm sm:text-base">{row.name}</div>
-                  </td>
+                 
                   <td className="px-2 sm:px-6 py-3 sm:py-4">
                     <span className="text-gray-700 font-semibold text-sm">
                       {row.base || '-'}
                     </span>
+                  </td>
+                  <td className="px-2 sm:px-6 py-3 sm:py-4">
+                    <div className="font-bold text-gray-900 text-sm sm:text-base">{row.name}</div>
                   </td>
                   <td className="px-2 sm:px-6 py-3 sm:py-4">
                     {row.category && (
@@ -368,8 +370,8 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
                           className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 text-xs sm:text-sm"
                         >
                           <MessageCircle className="w-3 h-3 sm:w-5 sm:h-5" />
-                          <span className="hidden sm:inline">Contact on Discord</span>
-                          <span className="sm:hidden">Contact</span>
+                          <span className="hidden sm:inline">Discord</span>
+                          <span className="sm:hidden">Discord</span>
                         </button>
                       ) : (
                         <span className="text-gray-400 text-xs sm:text-sm">No contact</span>
