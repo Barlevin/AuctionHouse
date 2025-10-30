@@ -29,6 +29,10 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
     { "class": "Melee", "type": "Armor", "name": "Platelegs" },
     { "class": "Melee", "type": "Armor", "name": "Shield" },
     { "class": "Melee", "type": "Armor", "name": "Gilded Quiver" },
+    { "class": "Melee", "type": "Armor", "name": "Thread Bracer" },
+    { "class": "Melee", "type": "Armor", "name": "Thread Poleyns" },
+    { "class": "Melee", "type": "Armor", "name": "Thread Boots" },
+    { "class": "Melee", "type": "Armor", "name": "Thread Mantle" },
 
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Hood" },
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Hat" },
@@ -37,6 +41,7 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Top" },
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Bottom" },
     { "class": "Sorcerer", "type": "Armor", "name": "Gilded Spellbook" },
+    
   
     { "class": "Guardian", "type": "Weapon", "name": "Bardiche" },
     { "class": "Guardian", "type": "Weapon", "name": "Battleaxe" },
@@ -46,7 +51,7 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
   
     { "class": "Rogue", "type": "Weapon", "name": "Curved Dagger" },
     { "class": "Rogue", "type": "Weapon", "name": "Dagger" },
-    { "class": "Rogue", "type": "Weapon", "name": "Short Sword" },
+    { "class": "Rogue", "type": "Weapon", "name": "Shortsword" },
     { "class": "Rogue", "type": "Weapon", "name": "Sword" },
   
     { "class": "Warrior", "type": "Weapon", "name": "Broadsword" },
@@ -64,6 +69,7 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
     { "class": "Archer", "type": "Weapon", "name": "Longbow" },
     { "class": "Archer", "type": "Weapon", "name": "Recurve Bow" },
     { "class": "Archer", "type": "Weapon", "name": "Shortbow" },
+
 
     { "class": "All", "type": "Amulet", "name": "Amulet Heal I" },
     { "class": "All", "type": "Amulet", "name": "AmuletHeal II" },
