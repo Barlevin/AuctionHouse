@@ -235,6 +235,12 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
     e.preventDefault();
     if (formData.name && formData.price && formData.rarity && formData.class) {
       try {
+        // At least one of IGN or Discord must be provided
+        if (!formData.ign && !formData.sellerDiscord) {
+          toast.error('Please provide either IGN or Discord contact');
+          return;
+        }
+
         // Validate that the item name exists in the items list
         const isValidItem = items.some(item => item.name === formData.name);
         if (!isValidItem) {
@@ -246,7 +252,8 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
         const selectedItem = items.find(item => item.name === formData.name);
         const itemCategory = selectedItem ? selectedItem.type : '';
 
-        if (!isValidDiscordContact(formData.sellerDiscord)) {
+        // Validate Discord only if provided
+        if (formData.sellerDiscord && !isValidDiscordContact(formData.sellerDiscord)) {
           toast.error('Please enter a valid Discord contact: numeric user ID (recommended), a full profile URL (https://discord.com/users/{id}), an invite (https://discord.gg/{code}), or a discord:// deep link.');
           return;
         }
@@ -508,7 +515,7 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
               {/* Discord Contact */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Discord Contact *
+                  Discord Contact
                   <button
                     type="button"
                     onClick={() => setShowDiscordHelp(!showDiscordHelp)}
@@ -541,14 +548,11 @@ const EditItemForm = ({ isOpen, onClose, onUpdateItem, itemToEdit }) => {
                     name="sellerDiscord"
                     value={formData.sellerDiscord}
                     onChange={handleChange}
-                    required
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
                     placeholder="Discord user ID, profile URL, or invite..."
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Recommended: Numeric user ID (e.g., 123456789012345678)
-                </p>
+                <p className="text-xs text-gray-500 mt-1">Provide at least one: IGN or Discord.</p>
               </div>
 
               {/* Submit Button */}

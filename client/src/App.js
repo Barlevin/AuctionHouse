@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "./components/Header";
 import AddItemForm from "./components/AddItemForm";
 import EditItemForm from "./components/EditItemForm";
+import BulkAddModal from "./components/BulkAddModal";
 import Table from "./pages/Table";
 import { motion } from "framer-motion";
 import { apiGet } from "./utils/api";
@@ -21,10 +22,41 @@ const App = () => {
   });
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
+
+  // Pagination
+  const pageSize = 100;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const fetchPage = async (page) => {
+    const offset = (page - 1) * pageSize;
+    const res = await apiGet(`/api/items?offset=${offset}&limit=${pageSize}`);
+    if (Array.isArray(res)) {
+      // fallback: server returned full array (no pagination support)
+      setItems(res.slice(offset, offset + pageSize));
+      setTotalCount(res.length);
+    } else {
+      setItems(res.items || []);
+      setTotalCount(res.total || 0);
+    }
+    setCurrentPage(page);
+  };
+
+  const fetchAllItems = async () => {
+    const res = await apiGet('/api/items');
+    return Array.isArray(res) ? res : (res.items || []);
+  };
 
   const handleAddItem = (newItem) => {
     setItems([...items, newItem]);
+    setTotalCount((c) => c + 1);
+  };
+
+  const handleItemsAdded = (newItems) => {
+    setItems(prev => [...prev, ...newItems]);
+    setTotalCount((c) => c + newItems.length);
   };
 
   const handleEditItem = (item) => {
@@ -41,8 +73,7 @@ const App = () => {
   const handleRefresh = async () => {
     try {
       setIsLoading(true);
-      const data = await apiGet('/api/items');
-      setItems(data);
+      await fetchPage(currentPage);
       setError(null);
       toast.success('Table refreshed successfully!');
     } catch (e) {
@@ -66,6 +97,7 @@ const App = () => {
 
       if (response.ok) {
         setItems(items.filter(item => item.id !== itemId));
+        setTotalCount((c) => Math.max(0, c - 1));
         toast.success('Item deleted successfully!');
       } else {
         const error = await response.json();
@@ -81,8 +113,7 @@ const App = () => {
     (async () => {
       try {
         setIsLoading(true);
-        const data = await apiGet('/api/items');
-        setItems(data);
+        await fetchPage(1);
         setError(null);
       } catch (e) {
         setError('Failed to load items from server');
@@ -122,6 +153,7 @@ const App = () => {
       />
       <Header 
         onAddItemClick={() => setShowAddForm(true)}
+        onBulkAddClick={() => setShowBulkModal(true)}
       />
 
       <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8 overflow-x-hidden w-full">
@@ -145,6 +177,12 @@ const App = () => {
           onDeleteItem={handleDeleteItem}
           onEditItem={handleEditItem}
           onRefresh={handleRefresh}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          totalCount={totalCount}
+          onPageChange={(p) => fetchPage(p)}
+          onFetchAll={fetchAllItems}
+          isLoading={isLoading}
         />
 
         <AddItemForm
@@ -162,6 +200,13 @@ const App = () => {
           }}
           onUpdateItem={handleUpdateItem}
           itemToEdit={itemToEdit}
+        />
+
+        <BulkAddModal
+          isOpen={showBulkModal}
+          onClose={() => setShowBulkModal(false)}
+          onItemsAdded={handleItemsAdded}
+          userId={currentUserId}
         />
       </main>
     </div>

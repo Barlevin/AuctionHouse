@@ -1,8 +1,8 @@
 import React from 'react';
-import { Gavel, Plus } from 'lucide-react';
+import { Gavel, Plus, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const Header = ({ onAddItemClick }) => {
+const Header = ({ onAddItemClick, onBulkAddClick }) => {
   return (
     <motion.header
       initial={{ y: -100 }}
@@ -26,7 +26,16 @@ const Header = ({ onAddItemClick }) => {
           </motion.div>
 
           {/* Navigation */}
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-3">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onBulkAddClick}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-lg font-semibold hover:bg-white/20 transition-colors shadow-md"
+            >
+              <Upload className="w-5 h-5" />
+              <span className="hidden sm:inline">Bulk Add</span>
+            </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

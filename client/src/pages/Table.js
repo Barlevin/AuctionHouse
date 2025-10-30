@@ -1,11 +1,35 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { ChevronUp, ChevronDown, Search, MessageCircle, Tag, Trash2, RefreshCw, Edit } from "lucide-react";
 import { motion } from "framer-motion";
+import toast from 'react-hot-toast';
 
-const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => {
+const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh, currentPage, pageSize, totalCount, onPageChange, onFetchAll, isLoading }) => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [searchQuery, setSearchQuery] = useState("");
   const [classFilter, setClassFilter] = useState("");
+  const [fullData, setFullData] = useState(null);
+  const [isLoadingAll, setIsLoadingAll] = useState(false);
+
+  const isFiltering = Boolean(searchQuery || classFilter);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadAll = async () => {
+      if (!isFiltering) return;
+      if (fullData) return;
+      try {
+        setIsLoadingAll(true);
+        const all = await onFetchAll();
+        if (!cancelled) setFullData(all);
+      } catch (e) {
+        toast.error('Failed to load all items for filtering');
+      } finally {
+        if (!cancelled) setIsLoadingAll(false);
+      }
+    };
+    loadAll();
+    return () => { cancelled = true; };
+  }, [isFiltering, fullData, onFetchAll]);
 
   const handleSort = (accessor) => {
     setSortConfig((prev) => {
@@ -22,6 +46,7 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
     }
   };
   
+  const dataSource = isFiltering ? (fullData || []) : data;
 
   const sortedData = useMemo(() => {
     const toNumber = (row, key) => {
@@ -31,7 +56,7 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
       return price * unit;
     };
 
-    let sortable = [...data];
+    let sortable = [...dataSource];
     if (sortConfig.key) {
       sortable.sort((a, b) => {
         const aValue = toNumber(a, sortConfig.key);
@@ -45,12 +70,10 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
       });
     }
     return sortable;
-  }, [data, sortConfig]);
+  }, [dataSource, sortConfig]);
 
   const filteredData = useMemo(() => {
     let filtered = sortedData;
-    
-    // Apply search filter
     if (searchQuery) {
       const lower = searchQuery.toLowerCase();
       filtered = filtered.filter((row) =>
@@ -59,22 +82,19 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
         )
       );
     }
-    
-    // Apply class filter
     if (classFilter) {
       filtered = filtered.filter((row) => row.class === classFilter);
     }
-    
     return filtered;
   }, [sortedData, searchQuery, classFilter]);
 
   const handleDiscordClick = (sellerDiscord) => {
-    if (!sellerDiscord) return;
+    if (!sellerDiscord) {
+      toast.error('Seller did not add a Discord ID please use his IGN');
+      return;
+    }
     const value = String(sellerDiscord).trim();
-
     const computeLinks = (val) => {
-      // deepLink: discord:// protocol (tries to open app)
-      // webLink: https fallback
       if (/^discord:\/\//i.test(val)) {
         return { deepLink: val, webLink: val.replace(/^discord:\/\//i, 'https://') };
       }
@@ -100,51 +120,39 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
           webLink: `https://discord.com/users/${val}`,
         };
       }
-      // Unsupported (e.g., username#1234)
       return null;
     };
 
     const links = computeLinks(value);
     if (!links) {
-      // Unknown format (e.g., username#1234). Try opening Discord app Home/DM list.
       const deepLink = 'discord://-/channels/@me';
       const webLink = 'https://discord.com/channels/@me';
-
       const a = document.createElement('a');
       a.href = deepLink;
       a.style.display = 'none';
       document.body.appendChild(a);
-
       const timer = setTimeout(() => {
         window.open(webLink, '_blank', 'noopener,noreferrer');
       }, 1200);
-
       const clear = () => clearTimeout(timer);
       window.addEventListener('blur', clear, { once: true });
       a.click();
-
       setTimeout(() => {
         document.body.removeChild(a);
         window.removeEventListener('blur', clear);
       }, 1500);
       return;
     }
-
-    // Create a temporary anchor to trigger the custom protocol reliably from a user gesture
     const a = document.createElement('a');
     a.href = links.deepLink;
     a.style.display = 'none';
     document.body.appendChild(a);
-
     const timer = setTimeout(() => {
       window.open(links.webLink, '_blank', 'noopener,noreferrer');
     }, 1200);
-
     const clear = () => clearTimeout(timer);
     window.addEventListener('blur', clear, { once: true });
     a.click();
-
-    // Cleanup
     setTimeout(() => {
       document.body.removeChild(a);
       window.removeEventListener('blur', clear);
@@ -159,6 +167,8 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
     if (unit === 'k') return `${base}k`;
     return base;
   };
+
+  const totalPages = Math.max(1, Math.ceil((isFiltering ? filteredData.length : totalCount) / pageSize || 1));
 
   return (
     <motion.div
@@ -202,7 +212,7 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
             <span className="hidden sm:inline">Refresh</span>
           </button>
           <div className="text-sm text-gray-500 font-medium whitespace-nowrap">
-            {filteredData.length} item{filteredData.length !== 1 ? 's' : ''}
+            {isFiltering ? filteredData.length : totalCount} item{(isFiltering ? filteredData.length : totalCount) !== 1 ? 's' : ''}
           </div>
         </div>
       </div>
@@ -211,7 +221,7 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
         <table className="min-w-full text-left text-sm text-gray-700">
           <thead className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white sticky top-0 z-10">
             <tr>
-           
+            
               <th className="px-2 sm:px-6 py-3 sm:py-4 font-bold uppercase tracking-wide text-xs cursor-pointer hover:bg-purple-700 transition-colors"
                 onClick={() => handleSort('base')}>
                 <div className="flex items-center gap-1">
@@ -369,21 +379,25 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
                   </td>
                   <td className="px-2 sm:px-6 py-3 sm:py-4">
                     <div className="flex justify-center gap-2">
-                      {row.sellerDiscord && (
-                        <div className="relative group">
-                          <button
-                            onClick={() => handleDiscordClick(row.sellerDiscord)}
-                            className="flex items-center justify-center p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105"
-                            title="Contact on Discord"
-                          >
-                            <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                          </button>
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
-                            Contact on Discord
-                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
-                          </div>
+                      <div className="relative group">
+                        <button
+                          onClick={() => {
+                            if (row.sellerDiscord) {
+                              handleDiscordClick(row.sellerDiscord);
+                            } else {
+                              toast.error('Seller did not add a Discord ID please use his IGN');
+                            }
+                          }}
+                          className="flex items-center justify-center p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105"
+                          title="Contact on Discord"
+                        >
+                          <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
+                          Contact on Discord
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
                         </div>
-                      )}
+                      </div>
                       {row.userId === currentUserId && (
                         <>
                           <div className="relative group">
@@ -422,6 +436,31 @@ const Table = ({ data, currentUserId, onDeleteItem, onEditItem, onRefresh }) => 
           </tbody>
         </table>
       </div>
+
+      {/* Pagination (only when not filtering) */}
+      {!isFiltering && (
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-t bg-white">
+          <div className="text-sm text-gray-600">
+            Page {currentPage} of {totalPages}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+              disabled={currentPage <= 1 || isLoading}
+              className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <button
+              onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage >= totalPages || isLoading}
+              className="px-3 py-1 rounded border text-sm disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };

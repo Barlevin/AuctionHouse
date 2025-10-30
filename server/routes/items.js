@@ -47,11 +47,22 @@ const writeData = (data) => {
   }
 };
 
-// GET /api/items - Get all auction items
+// GET /api/items - Get all auction items (supports pagination via ?offset=&limit=)
 router.get('/items', function(req, res, next) {
   try {
     const data = readData();
-    res.json(data.items || []);
+    const items = data.items || [];
+
+    const offset = Number.isFinite(parseInt(req.query.offset)) ? parseInt(req.query.offset) : null;
+    const limit = Number.isFinite(parseInt(req.query.limit)) ? parseInt(req.query.limit) : null;
+
+    if (offset !== null && limit !== null && limit >= 0 && offset >= 0) {
+      const paged = items.slice(offset, offset + limit);
+      return res.json({ items: paged, total: items.length });
+    }
+
+    // no pagination params → return all for backward compatibility
+    return res.json(items);
   } catch (error) {
     res.status(500).json({ error: 'Failed to read items' });
   }

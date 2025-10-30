@@ -21,7 +21,8 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
   const [showBaseSuggestions, setShowBaseSuggestions] = useState(false);
   const [showDiscordHelp, setShowDiscordHelp] = useState(false);
 
-  const [items,setItems] = useState([  { "type": "Armor", "name": "Helm" },
+  const [items,setItems] = useState([  
+    { "class": "Melee", "type": "Armor", "name": "Helm" },
     { "class": "Melee", "type": "Armor", "name": "Gauntlets" },
     { "class": "Melee", "type": "Armor", "name": "Greaves" },
     { "class": "Melee", "type": "Armor", "name": "Platemail" },
@@ -182,6 +183,12 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
     e.preventDefault();
     if (formData.name && formData.price) {
       try {
+        // At least one of IGN or Discord must be provided
+        if (!formData.ign && !formData.sellerDiscord) {
+          toast.error('Please provide either IGN or Discord contact');
+          return;
+        }
+
         // Validate that the item name exists in the items list
         const isValidItem = items.some(item => item.name === formData.name);
         if (!isValidItem) {
@@ -193,7 +200,8 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
         const selectedItem = items.find(item => item.name === formData.name);
         const itemCategory = selectedItem ? selectedItem.type : '';
 
-        if (!isValidDiscordContact(formData.sellerDiscord)) {
+        // If Discord is filled, validate format
+        if (formData.sellerDiscord && !isValidDiscordContact(formData.sellerDiscord)) {
           toast.error('Please enter a valid Discord contact: numeric user ID (recommended), a full profile URL (https://discord.com/users/{id}), an invite (https://discord.gg/{code}), or a discord:// deep link.');
           return;
         }
@@ -531,11 +539,10 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
                     value={formData.sellerDiscord}
                     onChange={handleChange}
                     placeholder="e.g. 123456789012345678"
-                    required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
                   />
                   <p className="mt-1 text-xs text-gray-500">
-                    Notice: Items will be automatically deleted after 14 days if not sold.
+                    Provide at least one: IGN or Discord. Items older than 14 days are auto-removed.
                   </p>
                 </div>
 
