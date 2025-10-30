@@ -30,7 +30,8 @@ const AddItemForm = ({ isOpen, onClose, onAddItem }) => {
     { "class": "Melee", "type": "Armor", "name": "Shield" },
     { "class": "Melee", "type": "Armor", "name": "Gilded Quiver" },
 
-    { "class": "Sorcerer", "type": "Armor", "name": "Thread Helm" },
+    { "class": "Sorcerer", "type": "Armor", "name": "Thread Hood" },
+    { "class": "Sorcerer", "type": "Armor", "name": "Thread Hat" },
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Gloves" },
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Boots" },
     { "class": "Sorcerer", "type": "Armor", "name": "Thread Top" },
