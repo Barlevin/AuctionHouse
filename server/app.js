@@ -4,9 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
-var cron = require('node-cron');
-var fs = require('fs');
-var path = require('path');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -31,35 +28,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', itemsRouter);
 // Note: Not using indexRouter as it would override React routing
 app.use('/users', usersRouter);
-
-// Daily cleanup at 07:00 local time: remove items older than 14 days
-const dataPath = path.join(__dirname, 'data.json');
-function cleanupOldItems() {
-  try {
-    if (!fs.existsSync(dataPath)) return;
-    const raw = fs.readFileSync(dataPath, 'utf8');
-    const json = JSON.parse(raw || '{"items":[]}');
-    const items = Array.isArray(json.items) ? json.items : [];
-    const now = Date.now();
-    const twoWeeksMs = 14 * 24 * 60 * 60 * 1000;
-    const filtered = items.filter((it) => {
-      const created = Date.parse(it.createdAt || 0) || 0;
-      return now - created <= twoWeeksMs;
-    });
-    if (filtered.length !== items.length) {
-      const updated = { ...json, items: filtered };
-      fs.writeFileSync(dataPath, JSON.stringify(updated, null, 2), 'utf8');
-      // eslint-disable-next-line no-console
-      console.log(`[cleanup] Removed ${items.length - filtered.length} expired items`);
-    }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('[cleanup] Failed:', e);
-  }
-}
-
-// Schedule: every day at 07:00 local time
-cron.schedule('0 7 * * *', cleanupOldItems);
 
 // Serve static files from React build folder
 const buildPath = path.join(__dirname, "../client/build");
